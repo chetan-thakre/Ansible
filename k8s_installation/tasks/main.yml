@@ -1,0 +1,35 @@
+---
+# tasks file for k8s_installation
+
+- name: copy the k8s repository file
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/
+
+- name: update yum repository and packages
+  yum:
+    name: '*'
+    state: latest
+ 
+- name: installing kubernetes
+  yum:
+    name: ['kubelet', 'kubeadm', 'kubectl', 'docker', 'python2-pip', 'libselinux-python']
+    enablerepo: kubernetes
+    state: present
+
+- name: enabling and starting kubelet and docker service 
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: 
+    - docker
+    - kubelet
+
+- name: disabling selinux status
+  selinux:
+    state: disabled
+
+- name: check_swap_status 
+  command: swapon -s 
+

@@ -1,0 +1,10 @@
+---
+  - name: this will check for httpd service 
+    hosts: localhost
+    gather_facts: false
+    become: false
+    tasks:
+      - name: check if the webserver group is correctly configured
+        uri:
+          url: 'http://13.52.178.59'
+          status_code: 200

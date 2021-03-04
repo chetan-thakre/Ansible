@@ -1,0 +1,8 @@
+---
+  - name: testing k8s installation 
+    hosts: k8s_control
+    become: true
+    gather_facts: false
+    tasks:
+      - include_role:
+          name: k8s_installation

@@ -1,0 +1,9 @@
+- name: copy the k8s repository file
+  copy: 
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/
+
+- name: update yum repository and packages 
+  yum:
+    name: '*'
+    state: latest

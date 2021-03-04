@@ -1,0 +1,28 @@
+#installing apache 
+
+---
+
+  - name: play1 for apache installation 
+    hosts: webserver
+    become: true
+    gather_facts: false
+    vars:
+      web_pkg: httpd
+      web_service: httpd
+      python_pkg: python-httpdlib2
+
+    tasks:
+      - name: install {{ web_pkg }}
+        yum: 
+          name: "{{ web_pkg }}"
+          state: present
+
+      - name: copy content to index.html
+        copy:
+          content: "chetan thakre"
+          dest: /var/www/html/index.html
+
+      - name: start {{ web_service }} service
+        service: 
+          name: "{{ web_service }}"
+          state: started

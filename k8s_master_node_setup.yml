@@ -1,0 +1,8 @@
+#this playbook is for installing kubernetes using ansible on control node 
+
+---
+  - name: installing kubernetes on control node 
+    hosts: k8s_control
+    gather_facts: true
+    tasks:
+      - name:  
