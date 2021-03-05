@@ -31,8 +31,36 @@
     state: disabled
 
 - name: disabling swap
-  command: swapoff -a 
+  command: 'swapoff -a'
 
 - name: initiating kubernetes master using kubeadm 
-  command: ['kubeadm init', 'mkdir -p $HOME/.kube', 'cp -i /etc/kubernetes/admin.conf $HOME/.kube/config', 'chown $(id -u):$(id -g) $HOME/.kube/config' ]
+  command: kubeadm init
 
+- name: create the .kube directory
+  file:
+    path: $HOME/.kube
+    state: directory
+
+- name: copy configuration file from /etc/kubernetes/admin.conf
+  copy:
+    src: /etc/kubernetes/admin.conf
+    remote_src: yes
+    dest: $HOME/.kube/config
+
+- name: changing ownership
+  file:
+    owner: root
+    group: root
+    path: $HOME/.kube/config
+
+- name: restart kubelet service 
+  service:
+    name: kubelet
+    state: restarted
+ 
+- name: getting kubeadm join token 
+  command: 'kubeadm token list -o json'
+  register: kubeadm_token
+
+- debug:
+    msg: "{{ kubeadm_token.stdout_lines[0].token }}"
