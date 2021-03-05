@@ -30,6 +30,9 @@
   selinux:
     state: disabled
 
-- name: check_swap_status 
-  command: swapon -s 
+- name: disabling swap
+  command: swapoff -a 
+
+- name: initiating kubernetes master using kubeadm 
+  command: ['kubeadm init', 'mkdir -p $HOME/.kube', 'cp -i /etc/kubernetes/admin.conf $HOME/.kube/config', 'chown $(id -u):$(id -g) $HOME/.kube/config' ]
 
