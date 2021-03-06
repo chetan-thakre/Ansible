@@ -1,0 +1,20 @@
+---
+# tasks file for k8sworker_setup
+
+  - name: installing required packages kubeadm, kubelet, docker
+    yum: 
+      name: ['docker', 'kubeadm', 'kubelet']
+      state: latest
+
+  - name: start services 
+    service: 
+      name: "{{ item }}"
+      state: started
+    with_items:
+      - docker
+      - kubelet
+
+  - name: joining to an existing kubernetes cluster
+    shell: | 
+      kubeadm join
+

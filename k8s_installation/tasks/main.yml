@@ -38,9 +38,11 @@
 
 - name: create the .kube directory
   file:
-    path: $HOME/.kube
+    path: "{{ item }}"
     state: directory
-
+  with_items:
+    - $HOME/.kube
+    - '"{{ playbook_dir }}"/group_vars'
 - name: copy configuration file from /etc/kubernetes/admin.conf
   copy:
     src: /etc/kubernetes/admin.conf
@@ -59,8 +61,12 @@
     state: restarted
  
 - name: getting kubeadm join token 
-  command: 'kubeadm token list -o json'
-  register: kubeadm_token
+  command: 'kubeadm token create --print-join-command'
+  register: kubeadm_join_command
 
-- debug:
-    msg: "{{ kubeadm_token.stdout_lines[0].token }}"
+- name: save the kubeadm command for later use 
+  copy:
+    content: "{{ kubeadm_join_command }}"
+    dest: '"{{ playbook_dir }}"/group_vars/all'
+
+
