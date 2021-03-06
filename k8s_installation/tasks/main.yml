@@ -38,11 +38,15 @@
 
 - name: create the .kube directory
   file:
-    path: "{{ item }}"
+    path: $HOME/.kube
     state: directory
-  with_items:
-    - $HOME/.kube
-    - '"{{ playbook_dir }}"/group_vars'
+
+- name: create a directory at localhost
+  file:
+    path: "{{ playbook_dir }}/group_vars"
+    state: directory
+  delegate_to: localhost
+
 - name: copy configuration file from /etc/kubernetes/admin.conf
   copy:
     src: /etc/kubernetes/admin.conf
@@ -66,7 +70,8 @@
 
 - name: save the kubeadm command for later use 
   copy:
-    content: "{{ kubeadm_join_command }}"
-    dest: '"{{ playbook_dir }}"/group_vars/all'
+    content: "token: {{ kubeadm_join_command.stdout }}"
+    dest: '{{ playbook_dir }}/group_vars/all.yaml'
+  delegate_to: localhost
 
 
