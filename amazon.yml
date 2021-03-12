@@ -1,0 +1,54 @@
+---
+ - name: launch ec2 instance
+   hosts: localhost
+   vars: 
+        username: arpit
+        vpc_id: vpc-7ffee317
+        firewall_rules_ports:
+         - 22
+         - 80
+         - 443  
+        ami_id: ami-0eeb03e72075b9bcc   
+        instance_type: t2.micro
+        az_b: subnet-ae18aad5
+        az_c: subnet-811822e9
+        az_a: subnet-02254e4e
+   connection: local
+   tasks:
+    - name: create keypair {{ username }} 
+      ec2_key:
+       name: "{{ username }}"
+       state: present
+      register: output
+
+    - name: debug output reigster
+      copy: 
+       content: "{{ output.key.private_key }}"
+       dest: /home/ec2-user/private-key/{{ username }}.pem
+       mode: 0400
+      when: output.changed
+ 
+    - name: create vpc {{ username }}
+      ec2_group:
+        name: "{{ username }}"
+        description: an example EC2 group
+        vpc_id: "{{ vpc_id }}"
+        rules:
+          - proto: tcp
+            ports: "{{ firewall_rules_ports }}"
+            cidr_ip: 0.0.0.0/0
+
+    - name: launch {{ instance_type }} 
+      ec2_instance:
+       name: "{{ username }}"
+       image_id: "{{ ami_id }}"
+       vpc_subnet_id: "{{ az_a }}"
+       instance_type: "{{ instance_type }}"
+       key_name: "{{ username }}"
+       security_group: "{{ username }}"
+       wait: yes
+      register: ec2_output
+
+    - name: print ec2_output
+      debug:
+       msg: "{{  ec2_output ] }}"

@@ -1,0 +1,25 @@
+---
+ - name: launch ec2 instance
+   hosts: localhost
+   tasks:
+     - name: list all ec2_instance
+       ec2_instance_info:
+         instance_ids: 
+           - i-0e9f7e9050392329e
+       register: result
+
+#     - debug: 
+#        msg: "{{ result.instances[0].block_device_mappings[0].ebs.volume_id }}"
+
+     - set_fact: 
+         volume_id: "{{ result.instances[0].block_device_mappings[0].ebs.volume_id }}"
+
+     - name: gather facts about ebs volume 
+       ec2_vol_facts:
+         filters:
+           volume-id: "{{ volume_id }}"
+       register: vol_facts
+
+     - debug:
+         msg: "{{ vol_facts }}"
+

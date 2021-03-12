@@ -1,0 +1,34 @@
+---
+  - name: check the disk usage 
+    hosts: webserver
+    #   become: true
+    vars:
+      volume_id: vol-0af6a6a9e67702d11
+      instance_id: i-0e9f7e9050392329e
+
+    tasks: 
+      - name: check root fs space
+        shell: df -H | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5  }' | cut -d'%' -f1
+        register: storage
+
+      - set_fact: 
+          disk_usage: "{{ storage.stdout }}"
+
+      - name: extend the ebs volume 
+        shell: aws ec2 modify-volume --size 10 --volume-id "{{ volume_id }}"
+        register: modified_volume
+        when: disk_usage >= 20
+        delegate_to: localhost
+
+      - name: make a directory on localhost 
+        file:
+          path: "{{ playbook_dir }}/group_vars"
+          state: directory
+        delegate_to: localhost
+
+      - name: store the output in a file 
+        copy: 
+          content: "disk_usage: {{ disk_usage }}"
+          dest: "{{ playbook_dir }}/group_vars/all.yml"
+        delegate_to: localhost
+
