@@ -1,7 +1,7 @@
 ---
   - name: check the disk usage 
     hosts: webserver
-    #   become: true
+    become: true
     vars:
       volume_id: vol-0af6a6a9e67702d11
       instance_id: i-0e9f7e9050392329e
