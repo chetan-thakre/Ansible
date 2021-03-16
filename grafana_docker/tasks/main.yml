@@ -1,0 +1,25 @@
+---
+# tasks file for grafana_docker
+- block:
+        - name: copy the grafana repo file to managed node 
+          copy: 
+            src: grafana.repo
+            dest: /etc/yum.repos.d/
+
+        - name: enable repo and install grafana 
+          yum:
+            name: grafana
+            enablerepo: grafana
+            state: present 
+  rescue: 
+       
+        - name: delete the repository file from yum.repos.d
+          file: 
+            dest: /etc/yum.repos.d/grafana.repo
+            state: absent
+
+        - name: delete the package and disable repo
+          yum:
+            name: grafana
+            disablerepo: yes
+            state: absent

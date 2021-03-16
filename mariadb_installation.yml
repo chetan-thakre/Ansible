@@ -3,7 +3,28 @@
     hosts: webserver
     become: true 
     tasks:
-      - name: install mariadb-server package
-        yum:
-          name: mariadb-server
-          state: latest 
+      - block:
+          - name: install mariadb-server package
+            yum:
+              name: mariadb-server
+              state: latest 
+
+        rescue: 
+          - name: uninstall mariadb-server 
+            yum:
+              name: mariadb-server
+              state: absent
+
+        always:
+          - name: restart mariadb service
+            service:
+              name: mariadb
+              enabled: yes
+              state: restarted
+
+
+
+              
+
+...
+      

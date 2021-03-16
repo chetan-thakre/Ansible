@@ -1,0 +1,8 @@
+---
+  - name: installing grafana 
+    hosts: localhost
+    become: true 
+    roles:
+      - grafana_docker
+     
+
