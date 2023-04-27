@@ -11,6 +11,10 @@
     name: '*'
     state: latest
  
+- name: including dependecy containerd 
+  include_role: 
+    name: install_containerd
+
 - name: installing kubernetes
   yum:
     name: ['kubelet', 'kubeadm', 'kubectl', 'docker', 'python2-pip', 'libselinux-python']

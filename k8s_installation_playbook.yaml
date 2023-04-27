@@ -1,0 +1,19 @@
+---
+  - name: testing k8s installation 
+    hosts: localhost
+    become: true
+    gather_facts: false
+    tasks:
+      - debug:
+          msg: "{{ playbook_dir }}"
+
+      - include_role:
+          name: k8s_installation
+
+#  - name: adding another node to cluster
+#    hosts: webserver
+#    become: true
+#    gather_facts: false
+#    tasks:
+#      - include_role:
+#          name: k8sworker_setup

@@ -1,0 +1,56 @@
+---
+# tasks file for install_containerd
+- name: get tar file of containerd from official repository
+  get_url:
+    url: "https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz"
+    dest: "{{ lookup('env', 'HOME') }}/containerd.tar.gz"
+
+- name: extracting containerd tar file. 
+  unarchive:
+    src: "{{ lookup('env', 'HOME') }}/containerd.tar.gz"
+    dest: /usr/local
+
+- name: creating system directory as needed 
+  file:
+    path: "/usr/local/lib/systemd/system/"
+    state: directory
+
+- name: downloading service file for containerd
+  get_url:
+    url: "https://raw.githubusercontent.com/containerd/containerd/main/containerd.service"
+    dest: "/usr/local/lib/systemd/system/"
+
+- name: restarting systemd 
+  systemd:
+    daemon_reload: true
+
+- name: enabling containerd at boot 
+  service:
+    name: containerd
+    enabled: true
+
+- name: downloading runc as it's a dependency
+  get_url:
+    url: "https://github.com/opencontainers/runc/releases/download/v1.1.7/runc.amd64"
+    dest: "{{ lookup('env', 'HOME') }}/runc.amd64"
+
+- name: execute command to install runc
+  shell: "install -m 755 {{ lookup('env', 'HOME') }}/runc.amd64 /usr/local/sbin/runc"
+
+- name: download cni dependency
+  get_url: 
+    url: "https://github.com/containernetworking/plugins/releases/download/v1.2.0/cni-plugins-linux-amd64-v1.2.0.tgz"
+    dest: "{{ lookup('env', 'HOME') }}/cni.tgz"
+
+- name: making directory for cni
+  file:
+    path: "/opt/cni/bin"
+    state: directory
+
+- name: unarchive file for cni
+  unarchive:
+    src: "{{ lookup('env', 'HOME') }}/cni.tgz"
+    dest: "/opt/cni/bin"
+
+
+  
